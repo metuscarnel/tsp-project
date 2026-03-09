@@ -11,3 +11,7 @@ Croisement : Récupérer une section (ensemble de ville) chez des parents pour c
 Fonction de mutation : Choix de deux villes au hasard et permutation 
 Fonction de génération de la nouvelle population : 
 Et récursivitié
+API de récupération des coordonnées et villes de france ( plusn fun à faire)
+
+ETL (Extract, Transform, Load) :
+Récupération de toutes les communes Françaises :     url = "https://geo.api.gouv.fr/communes?fields=nom,centre&format=json&geometry=centre"
