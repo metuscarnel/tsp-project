@@ -15,3 +15,6 @@ API de récupération des coordonnées et villes de france ( plusn fun à faire)
 
 ETL (Extract, Transform, Load) :
 Récupération de toutes les communes Françaises :     url = "https://geo.api.gouv.fr/communes?fields=nom,centre&format=json&geometry=centre"
+
+Je procède par une récupération des villes de france et leur coordonnées pour rendre le code un peu plmus réaliste.
+Choix de la taille de la population initiale

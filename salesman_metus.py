@@ -1,4 +1,6 @@
 from math import radians, cos, sin, sqrt, atan2
+import plotly.graph_objects as go
+import pandas as pd
 import json, haversine, random
 def haversine_distance(ville1, ville2):
     lat1, lon1 = ville1['latitude'], ville1['longitude']
@@ -26,10 +28,22 @@ def generate_random_villes(n):
         villes.append(nouvelle_ville)
 
     return villes
-    
-    
-communes_france = json.load(open("villes_france.json", "r", encoding="utf-8"))
-print(haversine_distance(communes_france[0], communes_france[1]))
-print("Villes sélectionnées pour le trajet :")
-for v in generate_random_villes(10):
-    print(f"- {v.nom} (Lat:{v.latitude:.2f}, Lon:{v.longitude:.2f})")
+
+def generate_individu(villes):
+    individu = villes[:]
+    random.shuffle(individu)
+    individu.append(individu[0]) 
+    return individu
+def generate_genese(villes, taille_population):
+    population = []
+    for _ in range(taille_population):
+        individu = generate_individu(villes)
+        population.append(individu)
+    return population
+
+for ville in generate_genese(generate_random_villes(3), 5):
+    i=1
+    print(f"Individu :{i}")
+    for v in ville:
+        print(f"- {v.nom} (Lat:{v.latitude:.2f}, Lon:{v.longitude:.2f})")
+    i += 1
