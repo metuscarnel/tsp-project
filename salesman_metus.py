@@ -3,9 +3,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import json, haversine, random
 def haversine_distance(ville1, ville2):
-    lat1, lon1 = ville1['latitude'], ville1['longitude']
-    lat2, lon2 = ville2['latitude'], ville2['longitude']
-    return haversine.haversine((lat1, lon1), (lat2, lon2))
+  return haversine.haversine((ville1.latitude, ville1.longitude), (ville2.latitude, ville2.longitude))
 
 class Ville:
     def __init__(self, nom, latitude, longitude):
@@ -28,11 +26,8 @@ def generate_random_villes(n):
         villes.append(nouvelle_ville)
 
     return villes
-
 def generate_individu(villes):
-    individu = villes[:]
-    random.shuffle(individu)
-    individu.append(individu[0]) 
+    individu = random.sample(villes, len(villes)) # Crée une nouvelle liste mélangée sans modifier l'originale
     return individu
 def generate_genese(villes, taille_population):
     population = []
@@ -41,9 +36,50 @@ def generate_genese(villes, taille_population):
         population.append(individu)
     return population
 
-for ville in generate_genese(generate_random_villes(3), 5):
-    i=1
+
+def fitness(individu):
+    distance_totale = 0
+    for i in range(len(individu) - 1):
+        distance_totale += haversine_distance(
+            individu[i],
+            individu[i+1]
+        )
+    # On ajoute le retour à la ville de départ ici, pas dans l'individu
+    distance_totale += haversine_distance(
+        individu[-1],
+        individu[0]
+    )
+    return 1 / distance_totale
+
+i=1
+for individu in generate_genese(generate_random_villes(10), 10):
     print(f"Individu :{i}")
-    for v in ville:
-        print(f"- {v.nom} (Lat:{v.latitude:.2f}, Lon:{v.longitude:.2f})")
+    for v in individu:
+        print(f"- {v.nom} (Lat:{v.latitude:.2f}, Lon:{v.longitude:.2f})" + f"")
+    print(f"Distance totale : {fitness(individu):.2f} km\n")
     i += 1
+def selection_tournoi(population):
+    population_tournoi = random.sample(population, 3) # Sélectionne 3 individus au hasard
+    deux_parents = sorted(population_tournoi, key=fitness, reverse=True)[:2] # Garde les 2 meilleurs
+    return deux_parents
+
+def ox_crossover(parent1, parent2):
+    taille = len(parent1)
+    enfant = [None] * taille
+
+    # Sélectionne deux points de crossover
+    point1, point2 = sorted(random.sample(range(taille), 2))
+
+    # Copie la section entre les deux points du parent1
+    enfant[point1:point2] = parent1[point1:point2]
+
+    # Remplit les positions restantes avec les villes du parent2 dans l'ordre
+    index_parent2 = 0
+    for i in range(taille):
+        if enfant[i] is None:
+            while parent2[index_parent2] in enfant:
+                index_parent2 += 1
+            enfant[i] = parent2[index_parent2]
+            index_parent2 += 1
+
+    return enfant
