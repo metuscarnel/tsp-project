@@ -51,35 +51,59 @@ def fitness(individu):
     )
     return 1 / distance_totale
 
-i=1
-for individu in generate_genese(generate_random_villes(10), 10):
-    print(f"Individu :{i}")
-    for v in individu:
-        print(f"- {v.nom} (Lat:{v.latitude:.2f}, Lon:{v.longitude:.2f})" + f"")
-    print(f"Distance totale : {fitness(individu):.2f} km\n")
-    i += 1
-def selection_tournoi(population):
-    population_tournoi = random.sample(population, 3) # Sélectionne 3 individus au hasard
+
+def selection_tournoi(population, k=3):
+    population_tournoi = random.sample(population, k) # Sélectionne k individus au hasard
     deux_parents = sorted(population_tournoi, key=fitness, reverse=True)[:2] # Garde les 2 meilleurs
     return deux_parents
 
 def ox_crossover(parent1, parent2):
+    
+    
     taille = len(parent1)
     enfant = [None] * taille
 
-    # Sélectionne deux points de crossover
-    point1, point2 = sorted(random.sample(range(taille), 2))
+    # 1. Sélection des segments
+    p1_idx, p2_idx = sorted(random.sample(range(taille), 2))
 
-    # Copie la section entre les deux points du parent1
-    enfant[point1:point2] = parent1[point1:point2]
+    # 2. Copie du segment du parent 1
+    enfant[p1_idx:p2_idx] = parent1[p1_idx:p2_idx]
+    
+    # On utilise un set pour que la recherche "in" soit instantanée (O(1))
+    villes_presentes = set(enfant)
 
-    # Remplit les positions restantes avec les villes du parent2 dans l'ordre
-    index_parent2 = 0
+    # 3. Remplissage avec le parent 2
+    # On commence à remplir APRES le segment copié pour respecter la logique OX
+    p2_index = 0
     for i in range(taille):
         if enfant[i] is None:
-            while parent2[index_parent2] in enfant:
-                index_parent2 += 1
-            enfant[i] = parent2[index_parent2]
-            index_parent2 += 1
-
+            while parent2[p2_index] in villes_presentes:
+                p2_index += 1
+            enfant[i] = parent2[p2_index]
+            villes_presentes.add(parent2[p2_index])
+    
     return enfant
+
+def swap_mutation(individu, p_mutation=0.02):
+    # On décide SI on mute en fonction de la probabilité p
+    if random.random() < p_mutation:
+        idx1, idx2 = random.sample(range(len(individu)), 2)
+        individu[idx1], individu[idx2] = individu[idx2], individu[idx1]
+    return individu
+
+def new_population(population, taille_population):
+    nouvelle_population = []
+    for _ in range(taille_population):
+        parent1, parent2 = selection_tournoi(population)
+        enfant = ox_crossover(parent1, parent2)
+        enfant_muté = swap_mutation(enfant)
+        nouvelle_population.append(enfant_muté)
+    return nouvelle_population
+
+i=1
+for individu in new_population(generate_genese(generate_random_villes(10), 10), 10):
+    print(f"Individu :{i}")
+    for v in individu:
+        print(f"- {v.nom} (Lat:{v.latitude:.2f}, Lon:{v.longitude:.2f})" + f"")
+    print(f"Distance totale : {1/fitness(individu):.2f} km\n")
+    i += 1
