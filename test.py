@@ -103,7 +103,7 @@ def new_population(population, taille):
 
 
 #fonction principale
-def tsp_algorithm(villes, taille_pop=50, gens=100):
+def tsp_algorithm(villes, taille_pop=100, gens=1000):
     pop = generate_population(villes, taille_pop)
     best = min(pop, key=distance)
 
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     random.seed(42) # Pour des résultats reproductibles
 
     # villes
-    villes = generate_random_villes(15)
+    villes = generate_random_villes(10)
 
     print("Calcul optimum (bruteforce)...")
     opt, _ = brute_force(villes)

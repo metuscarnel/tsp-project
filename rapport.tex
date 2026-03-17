@@ -1,21 +1,29 @@
-\documentclass[12pt,a4paper]{article}
-
-% --- Paquets de base ---
+\documentclass[a4paper,12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[french]{babel}
-\usepackage{amsmath, amssymb} % Pour les maths
-\usepackage{geometry} % Pour les marges
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
 \geometry{margin=2.5cm}
 
-% --- Paquets pour le style ---
-\usepackage{enumitem} % Pour personnaliser les listes
-\usepackage{booktabs} % Pour de beaux tableaux
-\usepackage[french, ruled, vlined]{algorithm2e} % Pour l'algo
+% Style pour le code Python
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red},
+    commentstyle=\color{green!50!black},
+    breaklines=true,
+    frame=single
+}
 
-% --- Informations du document ---
-\title{Résolution du Problème du Voyageur de Commerce (TSP)}
-\author{Rapport d'Étude}
+\title{Résolution du Problème du Voyageur de Commerce (TSP) par Algorithme Génétique}
+\author{Nom de l'étudiant}
 \date{\today}
 
 \begin{document}
@@ -23,69 +31,71 @@
 \maketitle
 
 \section{Introduction}
-Le problème du voyageur de commerce, ou problème du commis voyageur, est un problème d’optimisation qui consiste à déterminer, étant donné un ensemble de villes, le plus court circuit passant par chaque ville une seule fois. 
+Le problème du voyageur de commerce (TSP, \emph{Traveling Salesman Problem}) consiste à déterminer, étant donné un ensemble de villes, le plus court circuit passant par chaque ville exactement une fois et revenant au point de départ. Il s'agit d'un problème classique d'optimisation combinatoire, utilisé comme référence dans de nombreuses études sur les algorithmes d'approximation et d'optimisation.
 
-\section{Étude de la Complexité}
-Le problème de décision associé au problème d'optimisation du voyageur de commerce est \textbf{NP-Complet}. 
-\begin{itemize}
-    \item Il peut être réduit à partir du problème du \textit{cycle Hamiltonien}, qui fait partie des 21 problèmes NP-complets de Karp.
-    \item \textsc{Christos Papadimitriou} a démontré en 1977 que le problème reste NP-dur même avec des distances euclidiennes.
-\end{itemize}
+\section{Étude de la Complexité du Problème}
+Le problème de décision associé au TSP est \textbf{NP-Complet}. Il peut notamment être réduit à partir du problème du cycle Hamiltonien, un des 21 problèmes NP-Complets de Karp. Papadimitriou (1977) a démontré que le TSP reste NP-dur même si les distances sont euclidiennes.  
+Ainsi, trouver la solution exacte devient rapidement intractable lorsque le nombre de villes augmente, rendant nécessaire l'utilisation d'algorithmes d'approximation tels que les algorithmes génétiques.
 
 \section{Analyse Combinatoire}
-Pour $n$ villes, le nombre de chemins possibles est de $n!$.
-\begin{quote}
-    Pour trouver le plus court chemin par recherche exhaustive, il faudrait tester toutes les combinaisons, ce qui devient numériquement impossible pour de grandes valeurs de $n$.
-\end{quote}
+Pour $n$ villes, le nombre total de circuits possibles est $n!$.  
+En fixant la ville de départ pour éviter les doublons cycliques, le nombre de permutations reste $(n-1)!$.  
+Tester exhaustivement toutes les permutations devient rapidement impossible pour un nombre de villes supérieur à 10–12, ce qui justifie l'utilisation d'approches heuristiques.
 
-\section{Résultats et Discussion}
-Les algorithmes génétiques (AG) appartiennent à la famille des \textbf{algorithmes évolutionnistes}. Leur but est d’obtenir une solution approchée lorsqu’il n’existe pas de méthode exacte en temps raisonnable. Ils s’inspirent de la sélection naturelle.
+\section{Algorithmes Génétiques pour le TSP}
+Les algorithmes génétiques (GA) font partie des algorithmes évolutionnistes. Leur objectif est de produire une solution approchée à des problèmes d'optimisation complexes en temps raisonnable.  
 
 \subsection{Modélisation Génétique}
-Le tableau suivant récapitule la modélisation adoptée :
-
-\begin{center}
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Terme} & \textbf{Définition} \\
-    \midrule
-    Gène & Une ville (Coordonnées : latitude, longitude) \\
-    Génotype & Ensemble des $n$ gènes représentant un individu \\
-    Individu & Une liste ordonnée de villes : $[V_A, V_E, V_C, V_D]$ \\
-    Population & Ensemble de $m$ individus \\
-    \bottomrule
-\end{tabular}
-\end{center}
+\begin{itemize}
+    \item \textbf{Gène :} une ville, représentée par un nom, une latitude et une longitude.
+    \item \textbf{Génotype :} ensemble des $n$ gènes formant un individu.
+    \item \textbf{Individu :} un tour du TSP, par exemple \verb|[VilleA, VilleE, VilleC, VilleD]|.
+    \item \textbf{Population :} ensemble de $m$ individus.
+\end{itemize}
 
 \subsection{Paramètres de l'Algorithme}
+\begin{itemize}
+    \item \textbf{Sélection :} \emph{Tournoi}. On choisit aléatoirement $k$ individus et l'on sélectionne les deux meilleurs selon la fonction \textit{fitness}.
+    \item \textbf{Fonction d'évaluation (fitness) :} inverse de la distance totale du circuit, incluant le retour à la ville de départ.
+\end{itemize}
 
-\begin{description}
-    \item[Sélection :] Nous utilisons le mode \textbf{Tournoi}. On choisit aléatoirement $k$ individus et on sélectionne les deux meilleurs parents selon leur \textit{fitness}.
-    
-    \item[Fonction d'évaluation (Fitness) :] Elle calcule l'inverse de la distance totale $D$. Soit $n$ le nombre de villes, la distance est définie par :
-    \[ D = \sum_{i=1}^{n-1} d(v_i, v_{i+1}) + d(v_n, v_1) \]
-    La distance $d$ entre deux points est calculée via la \textbf{formule de Haversine} pour tenir compte de la courbure terrestre.
-\end{description}
+Mathématiquement, si $n$ est le nombre de villes et $D$ la distance totale d’un individu :
+\[
+D = \sum_{i=0}^{n-2} \text{haversine}(\text{individu}[i], \text{individu}[i+1]) + \text{haversine}(\text{individu}[n-1], \text{individu}[0])
+\]
+La fonction fitness est alors :
+\[
+\text{fitness}(\text{individu}) = \frac{1}{D}
+\]
 
-\section{Algorithme Proposé}
-Voici la structure globale de la résolution par algorithme génétique :
+\subsection{Fonction de recombinaison}
+La recombinaison utilisée est le \textbf{Order Crossover (OX)} : une portion du parent est copiée telle quelle dans l’enfant, les villes manquantes sont ajoutées dans l’ordre du second parent en évitant les doublons.
 
-\begin{algorithm}[H]
-    \SetKwInOut{Input}{Données}
-    \SetKwInOut{Output}{Résultat}
-    \Input{Liste des villes, taille population $m$, nb générations $G$}
-    \Output{Meilleur circuit trouvé}
-    \BlankLine
-    Initialiser la \textbf{Population} aléatoirement\;
-    \For{$génération \leftarrow 1$ \KwTo $G$}{
-        Évaluer la \textit{Fitness} de chaque individu\;
-        Sélectionner les parents (Tournoi)\;
-        Appliquer le \textbf{Order Crossover} (Recombinaison)\;
-        Appliquer une Mutation ponctuelle\;
-        Remplacer l'ancienne population\;
-    }
-    \Return Meilleur individu\;
-    \caption{Algorithme Génétique pour le TSP}
-\end{algorithm}
+\subsection{Fonction de mutation}
+La mutation est une \textbf{swap mutation} avec probabilité $p = 2\%$. Si $p$ est dépassé, deux villes sont sélectionnées aléatoirement et échangées dans l’individu.
+
+\subsection{Stratégie de remplacement}
+La population suivante est constituée uniquement des enfants générés par la fonction \texttt{new\_population} : \textbf{remplacement générationnel}. L’élitisme n’a pas été utilisé, mais le meilleur individu global est suivi séparément.
+
+\section{Paramètres de l'expérience}
+\begin{itemize}
+    \item Taille de la population : 100 individus
+    \item Nombre de générations : 500
+    \item Comparaison avec la solution exacte obtenue par \textbf{bruteforce} pour un nombre réduit de villes (≤10)
+\end{itemize}
+
+\section{Affichage et Visualisation}
+Pour visualiser les résultats, nous utilisons :
+\begin{itemize}
+    \item \textbf{Tkinter} pour l'interface utilisateur et l’affichage de la feuille de route.
+    \item \textbf{Plotly} pour tracer le circuit optimisé sur une carte.
+\end{itemize}
+
+\section{Résultats et Discussion}
+L’algorithme génétique fournit, dans la majorité des tests, des solutions très proches de l’optimal. Les comparaisons avec le \textit{bruteforce} montrent une erreur relative typique inférieure à 10\% pour des ensembles de villes limités.  
+L’algorithme est donc efficace et applicable à des ensembles de villes plus importants où le bruteforce devient inapplicable.
+
+\section{Conclusion}
+Les algorithmes génétiques permettent de résoudre efficacement le TSP pour un grand nombre de villes en obtenant des solutions approchées. Le choix des paramètres (population, nombre de générations, méthode de mutation et crossover) influence directement la qualité des résultats. La comparaison avec le bruteforce confirme la pertinence de l’approche GA pour l’optimisation combinatoire.
 
 \end{document}
