@@ -8,3 +8,4 @@
 *.fls
 *.lof
 *.lot
+/__pycache__
