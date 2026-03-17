@@ -1,6 +1,91 @@
-\documentclass{article}
-\begin{document}
-\title{Rapport de projet : Problème du voyageur de commerce}
-\author{Metus Gbogbo Houndada}
+\documentclass[12pt,a4paper]{article}
+
+% --- Paquets de base ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath, amssymb} % Pour les maths
+\usepackage{geometry} % Pour les marges
+\geometry{margin=2.5cm}
+
+% --- Paquets pour le style ---
+\usepackage{enumitem} % Pour personnaliser les listes
+\usepackage{booktabs} % Pour de beaux tableaux
+\usepackage[french, ruled, vlined]{algorithm2e} % Pour l'algo
+
+% --- Informations du document ---
+\title{Résolution du Problème du Voyageur de Commerce (TSP)}
+\author{Rapport d'Étude}
 \date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Le problème du voyageur de commerce, ou problème du commis voyageur, est un problème d’optimisation qui consiste à déterminer, étant donné un ensemble de villes, le plus court circuit passant par chaque ville une seule fois. 
+
+\section{Étude de la Complexité}
+Le problème de décision associé au problème d'optimisation du voyageur de commerce est \textbf{NP-Complet}. 
+\begin{itemize}
+    \item Il peut être réduit à partir du problème du \textit{cycle Hamiltonien}, qui fait partie des 21 problèmes NP-complets de Karp.
+    \item \textsc{Christos Papadimitriou} a démontré en 1977 que le problème reste NP-dur même avec des distances euclidiennes.
+\end{itemize}
+
+\section{Analyse Combinatoire}
+Pour $n$ villes, le nombre de chemins possibles est de $n!$.
+\begin{quote}
+    Pour trouver le plus court chemin par recherche exhaustive, il faudrait tester toutes les combinaisons, ce qui devient numériquement impossible pour de grandes valeurs de $n$.
+\end{quote}
+
+\section{Résultats et Discussion}
+Les algorithmes génétiques (AG) appartiennent à la famille des \textbf{algorithmes évolutionnistes}. Leur but est d’obtenir une solution approchée lorsqu’il n’existe pas de méthode exacte en temps raisonnable. Ils s’inspirent de la sélection naturelle.
+
+\subsection{Modélisation Génétique}
+Le tableau suivant récapitule la modélisation adoptée :
+
+\begin{center}
+\begin{tabular}{ll}
+    \toprule
+    \textbf{Terme} & \textbf{Définition} \\
+    \midrule
+    Gène & Une ville (Coordonnées : latitude, longitude) \\
+    Génotype & Ensemble des $n$ gènes représentant un individu \\
+    Individu & Une liste ordonnée de villes : $[V_A, V_E, V_C, V_D]$ \\
+    Population & Ensemble de $m$ individus \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Paramètres de l'Algorithme}
+
+\begin{description}
+    \item[Sélection :] Nous utilisons le mode \textbf{Tournoi}. On choisit aléatoirement $k$ individus et on sélectionne les deux meilleurs parents selon leur \textit{fitness}.
+    
+    \item[Fonction d'évaluation (Fitness) :] Elle calcule l'inverse de la distance totale $D$. Soit $n$ le nombre de villes, la distance est définie par :
+    \[ D = \sum_{i=1}^{n-1} d(v_i, v_{i+1}) + d(v_n, v_1) \]
+    La distance $d$ entre deux points est calculée via la \textbf{formule de Haversine} pour tenir compte de la courbure terrestre.
+\end{description}
+
+\section{Algorithme Proposé}
+Voici la structure globale de la résolution par algorithme génétique :
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{Données}
+    \SetKwInOut{Output}{Résultat}
+    \Input{Liste des villes, taille population $m$, nb générations $G$}
+    \Output{Meilleur circuit trouvé}
+    \BlankLine
+    Initialiser la \textbf{Population} aléatoirement\;
+    \For{$génération \leftarrow 1$ \KwTo $G$}{
+        Évaluer la \textit{Fitness} de chaque individu\;
+        Sélectionner les parents (Tournoi)\;
+        Appliquer le \textbf{Order Crossover} (Recombinaison)\;
+        Appliquer une Mutation ponctuelle\;
+        Remplacer l'ancienne population\;
+    }
+    \Return Meilleur individu\;
+    \caption{Algorithme Génétique pour le TSP}
+\end{algorithm}
+
 \end{document}
