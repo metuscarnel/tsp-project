@@ -23,4 +23,7 @@ https://www.tutorialspoint.com/genetic_algorithms/genetic_algorithms_mutation.ht
 Swap Mutation : selectionner deux chromosome au hasard et interchangé leur valeur avec une proba de 2% de mutation
 
 Stratégie de remplacement : Remplacement générationnel avec la methode (new_population), on génère des enfants pour remplacer la génération précédentes, la nouvelle generation est consitutée rien que d'enfants de la précédente.
-Fonction 
+https://docs.python.org/3/library/random.html
+https://fr.wikipedia.org/wiki/Algorithme_g%C3%A9n%C3%A9tique
+https://www.researchgate.net/figure/llustration-du-croisement-OX_fig2_274718261
+https://plotly.com/python/

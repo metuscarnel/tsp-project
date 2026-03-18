@@ -1,11 +1,11 @@
 from math import radians, cos, sin, sqrt, atan2
 import json, haversine, random, itertools
 
-#haversine distance
+
+# haversine distance
 def haversine_distance(ville1, ville2):
     return haversine.haversine(
-        (ville1.latitude, ville1.longitude),
-        (ville2.latitude, ville2.longitude)
+        (ville1.latitude, ville1.longitude), (ville2.latitude, ville2.longitude)
     )
 
 
@@ -37,8 +37,7 @@ def generate_random_villes(n):
     selection = random.sample(donnees_json, n)
 
     return [
-        Ville(item["nom"], item["latitude"], item["longitude"])
-        for item in selection
+        Ville(item["nom"], item["latitude"], item["longitude"]) for item in selection
     ]
 
 
@@ -50,17 +49,20 @@ def generate_individu(villes):
 
 
 def generate_population(villes, taille):
-   pop = []
-   for _ in range(taille):
-       pop.append(generate_individu(villes))
-   return pop
+    pop = []
+    for _ in range(taille):
+        pop.append(generate_individu(villes))
+    return pop
 
-#selection tournoi
+
+# selection tournoi
 def selection_tournoi(population, k=3):
     participants = random.sample(population, k)
     participants.sort(key=distance)
     return participants[0], participants[1]
-#order crossover
+
+
+# order crossover
 def ox_crossover(parent1, parent2):
     taille = len(parent1)
     enfant = [None] * taille
@@ -81,7 +83,7 @@ def ox_crossover(parent1, parent2):
     return enfant
 
 
-#swap mutation
+# swap mutation
 def swap_mutation(individu, p=0.02):
     if random.random() < p:
         i, j = random.sample(range(len(individu)), 2)
@@ -89,7 +91,7 @@ def swap_mutation(individu, p=0.02):
     return individu
 
 
-#nouvelle population
+# nouvelle population
 def new_population(population, taille):
     nouvelle = []
 
@@ -102,8 +104,8 @@ def new_population(population, taille):
     return nouvelle
 
 
-#fonction principale
-def tsp_algorithm(villes, taille_pop=100, gens=1000):
+# fonction principale
+def tsp_algorithm(villes, taille_pop=100, gens=500):
     pop = generate_population(villes, taille_pop)
     best = min(pop, key=distance)
 
@@ -117,7 +119,7 @@ def tsp_algorithm(villes, taille_pop=100, gens=1000):
     return best, distance(best)
 
 
-#analyse combinatoire brute-force pour tester et valider
+# analyse combinatoire brute-force pour tester et valider
 def brute_force(villes):
     best = float("inf")
     best_tour = None
@@ -135,21 +137,21 @@ def brute_force(villes):
 
 # main
 if __name__ == "__main__":
-    random.seed(42) # Pour des résultats reproductibles
+    random.seed(42)  # Pour des résultats reproductibles
 
     # villes
-    villes = generate_random_villes(10)
+    villes = generate_random_villes(100)
 
     print("Calcul optimum (bruteforce)...")
-    opt, _ = brute_force(villes)
+    # opt, _ = brute_force(villes)
 
     print("Algo génétique...")
     sol, dist = tsp_algorithm(villes)
 
     print("\nRésultats :")
-    print("Résultat bruteforce :", opt)
+    # print("Résultat bruteforce :", opt)
     print("Résultat algo génétique :", dist)
-    print("Taux d'erreur (%) :", (dist - opt) / opt * 100) #formule pour calculer le taux d'erreur
+    # print("Taux d'erreur (%) :", (dist - opt) / opt * 100) #calcul du taux d'erreur
 
     print("\nTour trouvé :")
     for v in sol:
