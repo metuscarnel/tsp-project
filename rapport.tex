@@ -22,7 +22,7 @@
 \maketitle
 
 \section{Contexte et Problématique}
-Ce projet de cours d'Intelligence Artificielle s'insère dans la mise en application des notions théoriques acquises au cours du semestre. Il s'agit d'une étude et d'une implémentation d'un algorithme génétique pour résoudre le problème du voyageur de commerce (TSP).
+Ce projet de cours d'Intelligence Artificielle s'insère dans la mise en application des notions théoriques acquises au cours du semestre. Il s'agit d'une étude et d'une implémentation d'un algorithme génétique pour résoudre le problème du voyageur de commerce (TSP \cite{wikipedia_tsp}).
 Le problème du voyageur de commerce (TSP, \emph{Traveling Salesman Problem}) consiste à déterminer, étant donné un ensemble de villes, le plus court chemin passant par chaque ville exactement une fois et revenant à la ville de départ. Il s'agit d'un problème classique d'optimisation combinatoire, utilisé comme référence dans de nombreuses études sur les algorithmes d'approximation et d'optimisation.
 Il est utilisé dans de nombreux domaines, notamment la logistique, la planification de tournées, et l'optimisation de réseaux.
 
@@ -66,14 +66,14 @@ Pour l'implémentation de notre algorithme génétique, nous avons modélisé le
 \subsection{Paramètres de l'Algorithme}
 \begin{itemize}
     \item \textbf{Fonction de Sélection :} \emph{Tournoi}. On choisit aléatoirement $k$ individus et l'on sélectionne les deux meilleurs selon la fonction \textit{fitness}.
-    \item \textbf{Fonction d'évaluation (fitness) :} La distance totale $D$ du circuit, calculée en utilisant la formule de Haversine, qui prend en compte la courbure de la Terre pour calculer les distances entre les villes à partir de leurs coordonnées géographiques. Entre deux solutions, celle qui a la plus petite distance totale est considérée comme la meilleure.
+    \item \textbf{Fonction d'évaluation (fitness) :} La distance totale $D$ du circuit, calculée en utilisant la formule de Haversine \cite{haversine}, qui prend en compte la courbure de la Terre pour calculer les distances entre les villes à partir de leurs coordonnées géographiques. Entre deux solutions, celle qui a la plus petite distance totale est considérée comme la meilleure.
     $D$ s'exprime comme suit :
     \[D = \sum_{i=1}^{n-1} d(v_i, v_{i+1}) + d(v_n, v_1)\]
-    où $d(v_i, v_j)$ est la distance entre les villes $v_i$ et $v_j$ calculée par la formule de Haversine et $v$ un individu.
+    où $d(v_i, v_j)$ est la distance entre les villes $v_i$ et $v_j$ calculée par la formule de Haversine \cite{haversine} et $v$ un individu.
 \end{itemize}
 
 \subsection{Fonction de recombinaison}
-La recombinaison utilisée est le \textbf{Order Crossover (OX)} : une portion du parent est copiée telle quelle dans l’enfant, les villes manquantes sont ajoutées dans l’ordre du second parent en évitant les doublons.
+La recombinaison utilisée est le \textbf{Order Crossover (OX) \cite{ox_crossover}} : une portion du parent est copiée telle quelle dans l’enfant, les villes manquantes sont ajoutées dans l’ordre du second parent en évitant les doublons.
 
 \subsection{Fonction de mutation}
 La mutation est une \textbf{swap mutation} avec une probabilité $p = 2\,\%$. Si un nombre $q$ généré aléatoirement est inférieur à $p$, deux villes sont sélectionnées aléatoirement et échangées dans l’individu.
@@ -88,14 +88,13 @@ La population suivante est constituée uniquement des enfants générés par cel
 \end{itemize}
 
 \section{Affichage et Visualisation}
-\texttt{NB :} notons que la gestion de l'affichage est réalisée dans un fichier tiers pour séparer la logique de notre algorithme de la partie interface utilisateur. Pour ce faire, les bibliothèques suivantes ont été utilisées :
+\texttt{NB :}  La gestion de l'affichage est réalisée dans un fichier tiers pour séparer la logique de notre algorithme de la partie interface utilisateur. Les bibliothèques suivantes ont été utilisées :
 \begin{itemize}
     \item \textbf{Tkinter} pour l'interface utilisateur et l’affichage de la feuille de route.
     \item \textbf{Plotly} pour tracer le circuit optimisé sur une carte.
 \end{itemize}
 
 \section{Résultats et Discussions}
-Notre algorithme principal fonctionne suivant l'algorithme représenté par le pseudo-code ci-dessous :
 \begin{algorithm}
 \caption{Algorithme Génétique pour le TSP}
 \label{alg:tsp}
@@ -118,7 +117,6 @@ Notre algorithme principal fonctionne suivant l'algorithme représenté par le p
 \end{algorithmic}
 \end{algorithm}
 
-La recherche de la solution optimale par une approche de force brute est représentée par le pseudo-code ci-dessous :
 \begin{algorithm}
 \caption{Bruteforce pour la résolution du TSP}
 \label{alg:tsp_bruteforce}
@@ -156,14 +154,17 @@ Pour améliorer notre algorithme et obtenir de meilleurs résultats, plusieurs p
     \item Introduire d'autres algorithmes de sélection (ex. \emph{roulette wheel}) ou de mutation (ex. inversion) pour diversifier les solutions.
     \item Utiliser des techniques d'élitisme pour garantir la conservation des meilleures solutions d'une génération à l'autre.
     \item Tester sur des instances plus grandes ($n \geq 20$ villes) et comparer avec d'autres heuristiques (ex. algorithme des colonies de fourmis, recuit simulé).
-    \item Utiliser la bibliothèque TSPLIB pour des benchmarks standardisés et comparer les performances de notre algorithme génétique avec d'autres approches publiées.
+    \item Utiliser la bibliothèque \texttt{tsplib} \cite{tsblib} pour des benchmarks standardisés et comparer les performances de notre algorithme génétique avec d'autres approches publiées.
     \item Concevoir une bibliothèque plus généralisée pour le TSP, offrant une possibilité de paramétrage plus flexible pour d'autres besoins d'expérimentation.
 \end{itemize}
 
 \section{Conclusion}
-Notre algorithme génétique permet de résoudre efficacement le TSP pour un grand nombre de villes en obtenant des solutions approchées. Le choix des paramètres (population, nombre de générations, méthodes de mutation et de croisement) influence directement la qualité des résultats. La comparaison avec la force brute confirme la pertinence de l’approche génétique pour l’optimisation combinatoire.
+Notre algorithme génétique permet de résoudre efficacement le TSP pour un grand nombre de villes en obtenant des solutions approchées. Le choix des paramètres (population, nombre de générations, méthodes de mutation et de croisement) influence directement la qualité des résultats. La comparaison avec les résultats de la brute-force confirme la pertinence de l’approche génétique pour l’optimisation combinatoire.
 De ce fait, de meilleurs choix de paramètres et d'autres techniques d'optimisation pourraient être explorés pour améliorer les performances et la qualité des solutions obtenues.
 
+% --- Modification ici ---
+\nocite{*} % Cette commande force LaTeX à inclure toutes les références du fichier .bib, même celles non citées dans le texte.
+\bibliographystyle{plain} 
 \bibliography{rapport}
-\bibliographystyle{plain} % Ajout d'un style de bibliographie standard si absent
+
 \end{document}

@@ -9,3 +9,5 @@
 *.lof
 *.lot
 /__pycache__
+*.bbl
+*.bib
